@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="shortcut icon" href="#">
+    <style>
+		body {background-color: #e7ecec;}
+		h3   {color: blue;}
+		
+		input    {	width: 50%; 
+					height: 35px;}
+					
+		button    {	color: white;
+		    		background-color: red;
+		    		width: 30%;
+		    		height: 35px;}
+		
+	</style>
+</head>
+<body>
+    <div id="response">
+    
+</div>
+
+<form id="my-form">
+	<div style ="text-align: center">
+	<h3>Product Information</h3>
+	
+	<label for="books">Select a book:</label><br>
+
+	<select name="books" id="books" style="width: 50%;height: 35px;">
+	  <option value="SKU123456">Distributed Operating Systems</option>
+	  <option value="Al23579">Algorithm</option>
+	  <option value="Md7his">Database Management</option>
+	  <option value="X0mot4tos">Machine Learning</option>
+	</select><br><br>
+	<input type="number" id="quantity" name="quantity" min="1" max="10" placeholder="Quantity"><br><br>
+	
+	<h3>Payment Information</h3>
+	<input type="text" id="creditCardNumber" name="creditCardNumber" placeholder="Credit card number" /><br><br> <input type="text" id="cvv" name="cvv" placeholder="CVV" /><br> <br>
+		<div class="expirationWrapper" >
+			<label for="expMonth">Expiration date:</label> <select id="expMonth"
+				class="errorAfterParent" name="expMonth" tabindex="14">
+				<option value="01">01</option>
+
+				<option value="02">02</option>
+
+				<option value="03">03</option>
+
+				<option value="04">04</option>
+
+				<option value="05">05</option>
+
+				<option value="06">06</option>
+
+				<option value="07">07</option>
+
+				<option value="08">08</option>
+
+				<option value="09">09</option>
+
+				<option value="10" selected="selected">10</option>
+
+				<option value="11">11</option>
+
+				<option value="12">12</option>
+
+			</select> <label for="expYear"><span class="screen-reader-text">Expiration
+					year:</span></label> <select id="expYear" class="errorAfterParent" name="expYear"
+				tabindex="15">
+
+				<option value="2020">2020</option>
+
+				<option value="2021">2021</option>
+
+				<option value="2022">2022</option>
+
+				<option value="2023">2023</option>
+
+				<option value="2024">2024</option>
+
+				<option value="2025">2025</option>
+
+				<option value="2026">2026</option>
+
+				<option value="2027">2027</option>
+
+				<option value="2028">2028</option>
+
+				<option value="2029">2029</option>
+
+				<option value="2030">2030</option>
+
+			</select>
+		</div>
+		<h3>Billing Information</h3>
+	
+    <input type="text" id="first_name" name="first-name" placeholder="First Name" /><br><br>
+    <input type="text" id="last_name" name="last-name" placeholder="Last Name" /><br><br>
+    <input type="email" id="email" name="email" placeholder="Email" /><br><br>
+    <input type="text" id="phone_number" name="phone_number" placeholder="Phone Number" /><br><br>
+    <input type="text" id="address1" name="address1" placeholder="Street Address" /><br><br>
+    <input type="text" id="city" name="city" placeholder="City" /><br><br>
+    <input type="text" id="state" name="state" placeholder="State" /><br><br>
+    <input type="text" id="zip_code" name="zip_code" pattern="[0-9]*" placeholder="Zip Code" /><br><br>
+    
+    <h3>Shipping Information</h3>
+    <label for="sameAsBilling"> Shipping Address same as Billing Address</label><br>
+  	<input type="checkbox" id="sameAsBilling" name="sameAsBilling" value="sameAsBilling"><br><br>
+    <div id='shipping-address-wrapper'>
+	    <input type="text" id="recipient_first_name" name="recipient_first_name" placeholder="Recipient First Name" /><br><br>
+	    <input type="text" id="recipient_last_name" name="recipient_last_name" placeholder="Recipient Last Name" /><br><br>
+	    <input type="email" id="recipient_email" name="recipient_email" placeholder="Recipient Email" /><br><br>
+	    <input type="text" id="recipient_phone_number" name="recipient_phone_number" placeholder="Recipient Phone Number" /><br><br>
+	    <input type="text" id="recipient_address1" name="recipient_address1" placeholder="Recipient Street Address" /><br><br>
+	    <input type="text" id="recipient_city" name="recipient_city" placeholder="Recipient City" /><br><br>
+	    <input type="text" id="recipient_state" name="recipient_state" placeholder="Recipient State" /><br><br>
+	    <input type="text" id="recipient_zip_code" name="recipient_zip_code" pattern="[0-9]*" placeholder="Recipient Zip Code" /><br><br>
+	</div>
+    <button type="submit">Submit</button>
+    </div>
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    (function($){
+        function processForm( e ){
+        	var serializedData = objectifyForm($( this ).serializeArray())
+        	console.log(serializedData);
+        	var sameShippingAndBilling = false;
+        	if($("#sameAsBilling").checked){
+        		sameShippingAndBilling = true;
+        	}
+        	
+            $.ajax({
+            	//hp
+            	url: 'http://localhost:9300/order',
+            	//dell
+                //url: 'http://localhost:9400/order',
+				headers : {'token' : '1234'},
+                dataType: 'json',
+                type: 'POST',
+				crossDomain : true,
+                contentType: 'application/json',
+				mimeType: 'application/json',
+                data: JSON.stringify(createJsonObject(serializedData, sameShippingAndBilling)),
+                success: function(msg, status, request){
+                	if(msg.orderId === '0'){
+                		//$('#main_alert').show();
+                		$('#response').append('<h4 id= "main_alert" style="color: red;"> Sorry! We are unable to process your order at this time, Please check back at later time</h4>');
+                	} else {
+                    	document.body.innerHTML = "<h3> THANK YOU for your purchase. Your order id is " + msg.orderId + "</h3>";
+                	}
+                },
+                error: function(xhr, status, error ){
+                	$('#response').append('<h4 id= "main_alert" style="color: red;"> Sorry! We are unable to process your order at this time, Please check back at later time!</h4>');
+                	$( 'html, body' ).animate( { scrollTop: 0 }, 0 );
+					console.log( error );
+                    
+                }
+            });
+			
+            e.preventDefault();
+        }
+
+        $('#my-form').submit( processForm );
+    })(jQuery);
+	
+	function createJsonObject(serializedData, sameShippingAndBilling){
+		var data ={};
+		data.lineItems =[];
+			
+		data.first_name = serializedData.first_name;
+		data.last_name = serializedData.first_name;
+		data.email = serializedData.email ;
+		data.phone_number = serializedData.phone_number ;
+		data.address1 = serializedData.address1;
+		data.city = serializedData.city;
+		data.state = serializedData.state;
+		data.zip_code = serializedData.zip_code;
+		data.payment_type = serializedData.payment_type;
+		data.creditCardNumber = serializedData.creditCardNumber;
+		data.shippingInfo = parseShippingInfo(serializedData, sameShippingAndBilling);
+		data.lineItems.push(parseLineItemsInfo(serializedData));
+				
+		console.log(data);	
+		
+		return data;
+	}
+	
+	function parseShippingInfo(serializedData, sameShippingAndBilling) {
+		var shippingInfo = {};
+		if(sameShippingAndBilling === true){
+			shippingInfo.recipient_first_name = serializedData.first_name;
+			shippingInfo.recipient_last_name = serializedData.first_name;
+			shippingInfo.recipient_email = serializedData.email;
+			shippingInfo.recipient_phone_number = serializedData.phone_number;
+			shippingInfo.recipient_address1 = serializedData.address1;
+			shippingInfo.recipient_city = serializedData.city;
+			shippingInfo.recipient_state = serializedData.state;
+			shippingInfo.recipient_zip_code = serializedData.zip_code;
+		} else {
+			shippingInfo.recipient_first_name = serializedData.recipient_first_name;
+			shippingInfo.recipient_last_name = serializedData.recipient_last_name;
+			shippingInfo.recipient_email = serializedData.recipient_email;
+			shippingInfo.recipient_phone_number = serializedData.recipient_phone_number;
+			shippingInfo.recipient_address1 = serializedData.recipient_address1;
+			shippingInfo.recipient_city = serializedData.recipient_city;
+			shippingInfo.recipient_state = serializedData.recipient_state;
+			shippingInfo.recipient_zip_code = serializedData.recipient_zip_code;
+		}
+		
+		return shippingInfo;
+	}
+	
+	function parseLineItemsInfo(serializedData) {
+        var lineItemsInfo = {};
+        lineItemsInfo.sku = serializedData.books;
+        lineItemsInfo.quantity = serializedData.quantity;;
+        
+        return lineItemsInfo;
+        
+	}
+
+	function objectifyForm(formArray) {
+	    //serialize data function
+	    var returnArray = {};
+	    for (var i = 0; i < formArray.length; i++){
+	    	if(formArray[i]['value'].length == 0){
+	    		alert("Pleaase enter valid information!")
+	    		return;
+	    	}
+	        returnArray[formArray[i]['name']] = formArray[i]['value'];
+	    }
+	    return returnArray;
+	}
+	
+	$("#sameAsBilling").change(function() {
+	    if(this.checked) {
+	    	$("#shipping-address-wrapper").hide();
+	    }else{
+	    	$("#shipping-address-wrapper").show();
+	    }
+	});
+	
+	
+</script>
+</body>
+</html>
